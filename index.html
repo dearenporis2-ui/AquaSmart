@@ -1192,6 +1192,18 @@
     .nav-links { display: none; }
     .desktop-only { display: none; }
 
+    /* kill the pill morph on mobile — min-width:560px overflows a phone screen */
+    nav.scrolled {
+      top: 0;
+      width: 100%;
+      min-width: unset;
+      border-radius: 0;
+      padding: 0.75rem 1.2rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      margin: 0;
+    }
+
     nav { padding: 0.9rem 1.2rem; }
     .hero { padding: 6rem 1.5rem 3rem; }
     .section { padding: 3rem 1.2rem; }
@@ -2051,8 +2063,9 @@
     cursorGlow.style.top  = e.clientY + 'px';
   });
 
-  // ── Scroll handler
+  // ── Scroll handler — parallax (skipped on mobile, too laggy)
   window.addEventListener('scroll', () => {
+    if (isMobile) return;
     if (!ticking) {
       requestAnimationFrame(() => {
         const scrollY = window.scrollY;
@@ -2198,10 +2211,12 @@
   }
 
 
-  // Hero scroll-out
+  // Hero scroll-out — skip on mobile (blur+transform every scroll frame = jank)
   const heroContent = document.querySelector('.hero-content');
   const heroSection = document.querySelector('.hero');
+  const isMobile = window.innerWidth <= 768;
   function updateHeroExit() {
+    if (isMobile) return;
     const progress = Math.min(window.scrollY / (heroSection.offsetHeight * 0.55), 1);
     const ease = 1 - Math.pow(1 - progress, 2);
     heroContent.style.transform = 'translateY(' + (ease * 80) + 'px) scale(' + (1 - ease * 0.04) + ')';
